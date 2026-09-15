@@ -1,58 +1,89 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# KözösTér
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Egyszerű, jóváhagyás-alapú webes közösségi oldal Laravel 13 és MySQL használatával. A felhasználók regisztrálhatnak, adminisztrátori jóváhagyás után beléphetnek, felhasználókra kereshetnek, ismerősnek jelölhetik egymást, értesítéseket kezelhetnek, kapcsolatot szüntethetnek meg és blokkolhatnak másokat.
 
-## About Laravel
+## Funkciók
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Regisztráció névvel, email címmel és jelszóval, adminisztrátori elbírálással.
+- Belépés csak jóváhagyott felhasználóknak.
+- Kereshető és lapozható felhasználói lista név és email alapján.
+- Ismerősnek jelölés, elfogadás, elutasítás és kapcsolat megszüntetése.
+- Felhasználók blokkolása és tiltás feloldása; blokkolt felhasználók nem jelölhetnek és nem jelennek meg releváns listákban.
+- Adatbázisban tárolt értesítések olvasott/olvasatlan állapottal.
+- Feature tesztek a fő üzleti folyamatokra.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Követelmények
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.3 vagy újabb
+- Composer
+- Node.js 20 vagy újabb és npm
+- MySQL 8 vagy MariaDB 10.6+
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Telepítés
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/gellert4/WebPage.git
+cd WebPage
+composer install
+cp .env.example .env
+php artisan key:generate
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Hozd létre a `kozoster` adatbázist MySQL-ben, majd állítsd be a `.env` fájlban a `DB_*` értékeket. Ezután:
 
-## Contributing
+```bash
+php artisan migrate --seed
+npm install
+npm run build
+php artisan storage:link
+php artisan serve
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Az alkalmazás a `http://127.0.0.1:8000` címen érhető el.
 
-## Code of Conduct
+Seedelt admin:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```text
+Email: admin@kozoster.local
+Jelszó: password
+```
 
-## Security Vulnerabilities
+Éles környezetben ezt a jelszót azonnal cseréld le.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Tesztelés
 
-## License
+A tesztek alapértelmezés szerint izolált SQLite memóriadatbázist használnak, így nem módosítják a fejlesztői MySQL adatbázist:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+php artisan test
+```
+
+## AI-alapú fejlesztési folyamat
+
+### Használt eszközök és modellek
+
+- **IDE és coding assistant:** Visual Studio Code, GitHub Copilot Chat és Copilot coding agent workflow.
+- **AI modell:** a fejlesztés ebben a VS Code Copilot munkamenetben történt. A Copilot felülete a backend modell konkrét verzióazonosítóját ebben a környezetben nem tette elérhetővé, ezért nem állítok ellenőrizetlenül GPT/Claude/Gemini modellnevet.
+- **Nem AI-eszközök:** Laravel 13, Composer, PHP 8.5, Vite, npm, PHPUnit, MySQL/SQLite és PowerShell. Ezeket futtatással, nem generatív javaslatként használtam.
+
+### Feladattípusok és workflow
+
+Az AI-t a lokális kód felderítésére, Laravel konvenciók szerinti adatmodell- és controller-tervezésre, Blade nézetekre, feature tesztekre és README-szerkesztésre használtam. A workflow minden funkciónál ugyanaz volt: kis lokális felület kijelölése, minimális implementáció, célzott futtatás, hiba javítása, majd külön git commit.
+
+Reprezentatív prompt: „Implementáld a regisztráció-jóváhagyás, ismerősi kérés, elfogadás/elutasítás, blokkolás és adatbázis-értesítés folyamatát Laravel natív Eloquent és Notification mintákkal, feature tesztekkel.”
+
+### Ellenőrzés és döntések
+
+- A migrációkat Artisan futtatással, a route-okat `route:list` paranccsal, a Blade nézeteket `view:cache` paranccsal, a CSS/JS-t `npm run build` paranccsal ellenőriztem.
+- Az üzleti viselkedést 5 feature teszt és 21 assertion fedi le: regisztráció, admin jóváhagyás, belépés, értesítések, ismerősi döntés, blokkolás/feloldás és keresés.
+- A jelszavakat Laravel hashed cast kezeli; a formok CSRF-védettek; minden admin és felhasználói művelet auth/middleware és szerveroldali validáció mögött van.
+- Az AI egyik első tesztjavaslata 2 értesítést várt a jelölőnél. A folyamat tényei alapján ez hibás volt: jelöléskor a címzett, elfogadáskor a jelölő kap értesítést, ezért a tesztet 1 értesítésre javítottam.
+- Több lehetséges adatkezelési megoldás közül a Laravel database notificationt és külön `friend_requests`/`blocks` táblákat választottam, mert ezek explicit állapotot, auditálható adatot és egyszerű tesztelhetőséget adnak.
+
+### Rövid értékelés
+
+A leghasznosabb az volt, hogy a Copilot gyorsan össze tudta állítani a Laravel rétegek közötti ismétlődő szerkezetet, miközben a lokális tesztfuttatás adta a döntő visszajelzést. Kevésbé volt alkalmas a Windows PHP-környezet automatikus felismerésére és az értesítési teszt kezdeti darabszámának helyes megítélésére. A legtöbb manuális ellenőrzés a jogosultsági határokra, a blokkolás kétirányú kizárására, a notification címzettekre és a MySQL konfigurációra kellett.
+
+## Git történet
+
+A fejlesztés tematikus commitokban készült: Laravel bootstrap, domain modell és értesítések, auth és közösségi üzleti logika, felület, majd feature tesztek és dokumentáció. Ez megkönnyíti a változások áttekintését és visszakeresését.

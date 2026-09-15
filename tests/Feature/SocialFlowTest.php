@@ -48,7 +48,7 @@ class SocialFlowTest extends TestCase
         $this->actingAs($recipient)->post(route('friends.respond', $request), ['decision' => 'accepted'])
             ->assertSessionHas('status');
         $this->assertDatabaseHas('friend_requests', ['id' => $request->id, 'status' => 'accepted']);
-        $this->assertSame(2, $sender->notifications()->count());
+        $this->assertSame(1, $sender->notifications()->count());
     }
 
     public function test_blocked_users_cannot_send_requests_or_appear_in_directory(): void
@@ -58,6 +58,8 @@ class SocialFlowTest extends TestCase
 
         $this->actingAs($blocked)->post(route('friends.send', $blocker))->assertForbidden();
         $this->actingAs($blocker)->get(route('users.index'))->assertDontSee($blocked->email);
+        $this->actingAs($blocker)->delete(route('blocks.destroy', $blocked))->assertSessionHas('status');
+        $this->assertDatabaseMissing('blocks', ['blocker_id' => $blocker->id, 'blocked_id' => $blocked->id]);
     }
 
     public function test_directory_can_search_by_name_or_email(): void
