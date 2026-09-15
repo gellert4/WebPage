@@ -2,7 +2,7 @@ name: Validate Szalai Automation production site
 
 on:
   push:
-    branches: ["szalai-production"]
+    branches: ["main", "szalai-production"]
     paths:
       - "szalai-automation-site/**"
       - ".github/workflows/szalai-automation-pages.yml"
