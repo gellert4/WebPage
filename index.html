@@ -7,6 +7,7 @@
   <meta name="description" content="Modern weboldalak és AI automatizálás kisvállalkozásoknak. Kevesebb admin, több érdeklődő, gyorsabb működés." />
   <meta name="robots" content="index,follow,max-image-preview:large" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://formsubmit.co; form-action 'self' https://formsubmit.co; img-src 'self' data:; style-src 'self'; script-src 'self' 'unsafe-inline'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests" />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="hu_HU" />
   <meta property="og:site_name" content="Szalai Automation" />
@@ -140,7 +141,7 @@
 
     <section id="ajanlat" class="section lead-section">
       <div class="lead-copy reveal"><div class="eyebrow light"><span></span> Ingyenes első felmérés</div><h2>Nézzük meg, nálad hol van a legkönnyebb plusz pénz vagy idő.</h2><p>Töltsd ki 1 perc alatt. Az üzenet közvetlenül megérkezik hozzám, és a megadott email címen tudok válaszolni.</p><div class="lead-points"><span>✓ Nincs kötelezettség</span><span>✓ Konkrét javaslatot kapsz</span><span>✓ 1 perc kitölteni</span></div></div>
-      <form id="leadForm" class="lead-form reveal delay-1" novalidate>
+      <form id="leadForm" class="lead-form reveal delay-1" action="https://formsubmit.co/szalai2003@gmail.com" method="POST">
         <div class="field-row">
           <label>Név / cégnév<input name="name" autocomplete="name" required maxlength="100" placeholder="Név / cégnév" /></label>
           <label>Email<input name="email" type="email" autocomplete="email" required maxlength="160" placeholder="email@ceg.hu" /></label>
@@ -152,7 +153,7 @@
         </label>
         <label>Mi viszi most a legtöbb időt vagy hol veszítesz ügyfelet?<textarea name="problem" required minlength="10" maxlength="2000" rows="4" placeholder="Pár mondat elég..."></textarea></label>
         <label>Tervezett keret<select name="budget" required><option value="">Válassz...</option><option>100–200 ezer Ft</option><option>200–400 ezer Ft</option><option>400–700 ezer Ft</option><option>700 ezer Ft felett</option><option>Még nem tudom</option></select></label>
-        <label class="consent"><input name="privacy" type="checkbox" required /> <span>Elolvastam és elfogadom az <a href="privacy.html" target="_blank" rel="noopener">adatkezelési tájékoztatót</a>.</span></label>
+        <label class="consent"><input name="privacy_notice" type="checkbox" required /> <span>Elolvastam az <a href="privacy.html" target="_blank" rel="noopener">adatkezelési tájékoztatót</a>.</span></label>
         <div class="hp-field" aria-hidden="true"><label>Weboldal<input name="_honey" tabindex="-1" autocomplete="off" /></label></div>
         <button id="submitBtn" class="btn btn-white full" type="submit">Ingyenes felmérést kérek <span>↗</span></button>
         <p id="formStatus" class="form-note" role="status" aria-live="polite">A beküldés után visszajelzést kapsz itt az oldalon.</p>
@@ -168,7 +169,7 @@
   </footer>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <noscript><div class="noscript">A kapcsolatfelvételi űrlaphoz JavaScript szükséges. Írj közvetlenül: <a href="mailto:szalai2003@gmail.com">szalai2003@gmail.com</a>.</div></noscript>
+  <noscript><div class="noscript">A kapcsolatfelvételi űrlap JavaScript nélkül is elküldhető, vagy írj közvetlenül: <a href="mailto:szalai2003@gmail.com">szalai2003@gmail.com</a>.</div></noscript>
   <script src="script.js" defer></script>
 </body>
 </html>
