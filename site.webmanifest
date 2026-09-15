@@ -1,13 +1,9 @@
 {
   "name": "Szalai Automation",
   "short_name": "Szalai Automation",
-  "description": "Weboldal és AI automatizálás kisvállalkozásoknak.",
   "start_url": "./",
-  "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0b1020",
-  "icons": [
-    {"src":"favicon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}
-  ]
+  "icons": []
 }
