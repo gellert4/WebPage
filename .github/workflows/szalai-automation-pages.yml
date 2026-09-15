@@ -21,22 +21,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Verify required production files
         run: |
           set -euo pipefail
           cd szalai-automation-site
-          for file in index.html styles.css production.css script.js privacy.html terms.html 404.html favicon.svg robots.txt sitemap.xml site.webmanifest .nojekyll .well-known/security.txt; do
+          for file in index.html styles.css production.css script.js privacy.html terms.html security.html thanks.html 404.html favicon.svg robots.txt sitemap.xml site.webmanifest vercel.json .nojekyll .well-known/security.txt; do
             test -e "$file" || { echo "Missing: $file"; exit 1; }
           done
           ! grep -R "contact@yourdomain" .
           ! grep -R "TODO\|FIXME" . --exclude=README.md
+          grep -q 'action="https://formsubmit.co/szalai2003@gmail.com"' index.html
+          grep -q 'form-action https://formsubmit.co' index.html
+          grep -q 'https://gellert4.github.io/WebPage/thanks.html' index.html
 
       - name: Validate JavaScript syntax
         run: node --check szalai-automation-site/script.js
 
-      - name: Validate manifest, sitemap and local references
+      - name: Validate JSON, XML, HTML and local references
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -45,6 +48,7 @@ jobs:
 
           root = Path('szalai-automation-site')
           json.loads((root/'site.webmanifest').read_text(encoding='utf-8'))
+          json.loads((root/'vercel.json').read_text(encoding='utf-8'))
           ET.parse(root/'sitemap.xml')
 
           class Parser(HTMLParser):
@@ -77,3 +81,6 @@ jobs:
           curl --fail --silent http://127.0.0.1:8080/ | grep -q "Szalai Automation"
           curl --fail --silent http://127.0.0.1:8080/privacy.html | grep -q "Adatkezelési"
           curl --fail --silent http://127.0.0.1:8080/terms.html | grep -q "Jogi"
+          curl --fail --silent http://127.0.0.1:8080/security.html | grep -q "Biztonság"
+          curl --fail --silent http://127.0.0.1:8080/thanks.html | grep -q "Köszönöm"
+          curl --fail --silent http://127.0.0.1:8080/.well-known/security.txt | grep -q "Contact: mailto:szalai2003@gmail.com"
