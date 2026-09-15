@@ -1,34 +1,31 @@
-# Szalai Automation – lead-generating landing page
+# Szalai Automation
 
-Kész, statikus weboldal kisvállalkozásoknak szóló web + AI automatizálási szolgáltatáshoz.
+Production-oriented static landing page for a Hungarian web-development and AI-automation service.
 
-## Indítás
-Dupla katt az `index.html` fájlra, vagy VS Code Live Server.
+## Live target
 
-## Kötelező indulás előtt
-1. Nyisd meg a `script.js` fájlt.
-2. Cseréld ezt:
-   `const CONTACT_EMAIL = 'contact@yourdomain.hu';`
-   a saját üzleti emailedre.
-3. Opcionálisan cseréld a márkanevet és az árakat.
+GitHub Pages: `https://gellert4.github.io/WebPage/`
 
-## Élesítés
-Feltölthető bármilyen statikus tárhelyre, például Vercel, Netlify vagy GitHub Pages.
+## What is included
 
-## Mitől üzletileg erős
-- egyértelmű probléma → eredmény üzenet
-- 3 jól elkülönített szolgáltatás
-- 3 árszint az anchor pricing miatt
-- ROI kalkulátor
-- alacsony súrlódású CTA
-- kvalifikáló lead űrlap
-- mobil optimalizálás
-- alap SEO meta + schema markup
+- responsive landing page
+- three service packages
+- ROI calculator
+- accessible mobile navigation and reduced-motion support
+- real lead form via FormSubmit with honeypot spam protection and mail fallback
+- SEO metadata, canonical URL, JSON-LD, robots.txt and sitemap.xml
+- privacy and legal notice pages
+- custom 404 page and favicon
+- GitHub Pages deployment workflow
 
-## Következő fejlesztések, ha már van 3–5 ügyfél
-- valódi backend lead form
-- Calendly / időpontfoglalás
-- CRM integráció
-- esettanulmányok valódi ügyféladatokkal
-- remarketing pixel
-- angol verzió
+## Lead flow
+
+Submissions are sent to `szalai2003@gmail.com` through FormSubmit. FormSubmit requires one-time email activation before live leads are delivered.
+
+## Deployment
+
+The branch `szalai-automation` is deployed by GitHub Actions. The workflow uploads only this directory, so the existing Laravel app in the repository is not included in the Pages artifact.
+
+## Before using a custom domain
+
+Update the canonical and sitemap URLs in `index.html`, `privacy.html`, `terms.html`, `robots.txt` and `sitemap.xml`, then configure the custom domain in GitHub Pages or the selected hosting provider.
