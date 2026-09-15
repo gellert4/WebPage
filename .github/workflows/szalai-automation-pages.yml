@@ -2,12 +2,15 @@ name: Validate Szalai Automation production site
 
 on:
   push:
-    branches: ["szalai-automation"]
+    branches: ["szalai-production"]
     paths:
       - "szalai-automation-site/**"
       - ".github/workflows/szalai-automation-pages.yml"
   pull_request:
     branches: ["main"]
+    paths:
+      - "szalai-automation-site/**"
+      - ".github/workflows/szalai-automation-pages.yml"
   workflow_dispatch:
 
 permissions:
@@ -17,19 +20,18 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout production branch
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: szalai-automation
 
       - name: Verify required production files
         run: |
           set -euo pipefail
           cd szalai-automation-site
-          for file in index.html styles.css production.css script.js privacy.html terms.html 404.html favicon.svg robots.txt sitemap.xml site.webmanifest; do
-            test -s "$file" || { echo "Missing or empty: $file"; exit 1; }
+          for file in index.html styles.css production.css script.js privacy.html terms.html 404.html favicon.svg robots.txt sitemap.xml site.webmanifest .nojekyll .well-known/security.txt; do
+            test -e "$file" || { echo "Missing: $file"; exit 1; }
           done
           ! grep -R "contact@yourdomain" .
+          ! grep -R "TODO\|FIXME" . --exclude=README.md
 
       - name: Validate JavaScript syntax
         run: node --check szalai-automation-site/script.js
@@ -38,18 +40,30 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
+          from html.parser import HTMLParser
           import json, re, xml.etree.ElementTree as ET
+
           root = Path('szalai-automation-site')
-          json.loads((root/'site.webmanifest').read_text())
+          json.loads((root/'site.webmanifest').read_text(encoding='utf-8'))
           ET.parse(root/'sitemap.xml')
-          html = (root/'index.html').read_text()
-          refs = re.findall(r'(?:href|src)="([^"#]+)"', html)
-          for ref in refs:
-              if ref.startswith(('http://','https://','mailto:')):
-                  continue
-              path = root / ref.split('?')[0]
-              if not path.exists():
-                  raise SystemExit(f'Missing local reference: {ref}')
+
+          class Parser(HTMLParser):
+              def error(self, message):
+                  raise RuntimeError(message)
+
+          for html_file in root.glob('*.html'):
+              text = html_file.read_text(encoding='utf-8')
+              Parser().feed(text)
+              refs = re.findall(r'(?:href|src)="([^"#]+)"', text)
+              for ref in refs:
+                  if ref.startswith(('http://','https://','mailto:','tel:')):
+                      continue
+                  local = ref.split('?')[0]
+                  if local in ('', './'):
+                      continue
+                  path = root / local
+                  if not path.exists():
+                      raise SystemExit(f'{html_file}: missing local reference: {ref}')
           print('Static production checks passed')
           PY
 
