@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://gellert4.github.io/WebPage/sitemap.xml
