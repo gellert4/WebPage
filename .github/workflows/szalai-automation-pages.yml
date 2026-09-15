@@ -6,7 +6,6 @@ on:
     paths:
       - "szalai-automation-site/**"
       - ".github/workflows/szalai-automation-pages.yml"
-      - ".formsubmit-activation-trigger"
   pull_request:
     branches: ["main"]
   workflow_dispatch:
@@ -66,18 +65,3 @@ jobs:
           curl --fail --silent http://127.0.0.1:8080/terms.html | grep -q "Jogi"
           curl --fail --silent http://127.0.0.1:8080/security.html | grep -q "Biztonság"
           curl --fail --silent http://127.0.0.1:8080/thanks.html | grep -q "Köszönöm"
-
-      - name: One-time FormSubmit activation request
-        if: contains(github.event.head_commit.message, '[activate-form]')
-        run: |
-          curl --fail-with-body --silent --show-error \
-            -H 'Accept: application/json' \
-            -X POST 'https://formsubmit.co/ajax/szalai2003@gmail.com' \
-            -F 'name=Szalai Automation setup' \
-            -F 'email=szalai2003@gmail.com' \
-            -F 'service=Setup test' \
-            -F 'problem=One-time FormSubmit activation test. This is not a customer lead.' \
-            -F 'budget=Setup test' \
-            -F '_subject=Szalai Automation form activation test' \
-            -F '_captcha=false' \
-            -F '_url=https://gellert4.github.io/WebPage/'
