@@ -6,6 +6,11 @@ on:
     paths:
       - "szalai-automation-site/**"
       - ".github/workflows/szalai-automation-pages.yml"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "szalai-automation-site/**"
+      - ".github/workflows/szalai-automation-pages.yml"
   workflow_dispatch:
 
 permissions:
