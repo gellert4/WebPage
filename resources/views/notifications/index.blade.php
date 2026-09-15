@@ -1,4 +1,0 @@
-@extends('layouts.app')
-@section('content')
-<section class="hero-row compact"><div><p class="eyebrow">ÉRTESÍTÉSEK</p><h1>Nem maradsz le semmiről.</h1><p class="lede">Az ismerősi kérelmek és válaszok itt maradnak meg.</p></div></section><section class="panel notification-list">@forelse($notifications as $notification)<div class="notification-row {{ $notification->read_at ? '' : 'unread' }}"><span class="notification-dot"></span><div><p>{{ $notification->data['message'] }}</p><span class="muted">{{ $notification->created_at->diffForHumans() }}</span></div>@if(!$notification->read_at)<form method="POST" action="{{ route('notifications.read', $notification->id) }}">@csrf @method('PATCH')<button class="button subtle small" type="submit">Olvasottnak jelölöm</button></form>@else<span class="muted">Olvasott</span>@endif</div>@empty<p class="empty">Nincsenek értesítések.</p>@endforelse<div class="pagination">{{ $notifications->links() }}</div></section>
-@endsection
