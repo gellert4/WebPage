@@ -1,4 +1,4 @@
-name: Deploy Szalai Automation to GitHub Pages
+name: Validate Szalai Automation production site
 
 on:
   push:
@@ -6,37 +6,60 @@ on:
     paths:
       - "szalai-automation-site/**"
       - ".github/workflows/szalai-automation-pages.yml"
+  pull_request:
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "szalai-automation-pages"
-  cancel-in-progress: true
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  validate:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout production branch
         uses: actions/checkout@v4
-
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
         with:
-          enablement: true
+          ref: szalai-automation
 
-      - name: Upload static site
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./szalai-automation-site
+      - name: Verify required production files
+        run: |
+          set -euo pipefail
+          cd szalai-automation-site
+          for file in index.html styles.css production.css script.js privacy.html terms.html 404.html favicon.svg robots.txt sitemap.xml site.webmanifest; do
+            test -s "$file" || { echo "Missing or empty: $file"; exit 1; }
+          done
+          ! grep -R "contact@yourdomain" .
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Validate JavaScript syntax
+        run: node --check szalai-automation-site/script.js
+
+      - name: Validate manifest, sitemap and local references
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json, re, xml.etree.ElementTree as ET
+          root = Path('szalai-automation-site')
+          json.loads((root/'site.webmanifest').read_text())
+          ET.parse(root/'sitemap.xml')
+          html = (root/'index.html').read_text()
+          refs = re.findall(r'(?:href|src)="([^"#]+)"', html)
+          for ref in refs:
+              if ref.startswith(('http://','https://','mailto:')):
+                  continue
+              path = root / ref.split('?')[0]
+              if not path.exists():
+                  raise SystemExit(f'Missing local reference: {ref}')
+          print('Static production checks passed')
+          PY
+
+      - name: Smoke test over HTTP
+        run: |
+          cd szalai-automation-site
+          python -m http.server 8080 >/tmp/szalai-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill $server_pid' EXIT
+          sleep 1
+          curl --fail --silent http://127.0.0.1:8080/ | grep -q "Szalai Automation"
+          curl --fail --silent http://127.0.0.1:8080/privacy.html | grep -q "Adatkezelési"
+          curl --fail --silent http://127.0.0.1:8080/terms.html | grep -q "Jogi"
