@@ -33,8 +33,10 @@ jobs:
           ! grep -R "contact@yourdomain" .
           ! grep -R "TODO\|FIXME" . --exclude=README.md
           grep -q 'action="https://formsubmit.co/szalai2003@gmail.com"' index.html
-          grep -q 'form-action https://formsubmit.co' index.html
+          grep -q "form-action 'self' https://formsubmit.co" index.html
           grep -q 'https://gellert4.github.io/WebPage/thanks.html' index.html
+          grep -q 'id="langToggle"' index.html
+          grep -q 'id="themeToggle"' index.html
 
       - name: Validate JavaScript syntax
         run: node --check szalai-automation-site/script.js
