@@ -27,7 +27,7 @@ jobs:
         run: |
           set -euo pipefail
           cd szalai-automation-site
-          for file in index.html styles.css production.css script.js privacy.html terms.html security.html thanks.html 404.html favicon.svg robots.txt sitemap.xml site.webmanifest vercel.json .nojekyll .well-known/security.txt; do
+          for file in index.html styles.css production.css motion-enhancements.css script.js privacy.html terms.html security.html thanks.html 404.html favicon.svg robots.txt sitemap.xml site.webmanifest vercel.json .nojekyll .well-known/security.txt; do
             test -e "$file" || { echo "Missing: $file"; exit 1; }
           done
           ! grep -R "contact@yourdomain" .
@@ -37,6 +37,8 @@ jobs:
           grep -q 'https://gellert4.github.io/WebPage/thanks.html' index.html
           grep -q 'id="langToggle"' index.html
           grep -q 'id="themeToggle"' index.html
+          grep -q "motion-enhancements.css" script.js
+          grep -q "workflow-active" motion-enhancements.css
 
       - name: Validate JavaScript syntax
         run: node --check szalai-automation-site/script.js
@@ -81,6 +83,7 @@ jobs:
           trap 'kill $server_pid' EXIT
           sleep 1
           curl --fail --silent http://127.0.0.1:8080/ | grep -q "Szalai Automation"
+          curl --fail --silent http://127.0.0.1:8080/motion-enhancements.css | grep -q "Laptop hero"
           curl --fail --silent http://127.0.0.1:8080/privacy.html | grep -q "Adatkezelési"
           curl --fail --silent http://127.0.0.1:8080/terms.html | grep -q "Jogi"
           curl --fail --silent http://127.0.0.1:8080/security.html | grep -q "Biztonság"
