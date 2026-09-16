@@ -78,7 +78,7 @@ themeToggle?.addEventListener('click', () => setTheme(currentTheme === 'dark' ? 
 
 menuBtn?.addEventListener('click', () => {
   const open = nav?.classList.toggle('open');
-  menuBtn.setAttribute('aria-expanded', String(Boolean(open)));
+  menuBtn?.setAttribute('aria-expanded', String(Boolean(open)));
 });
 document.querySelectorAll('.nav a').forEach((a) => a.addEventListener('click', () => {
   nav?.classList.remove('open');
@@ -102,11 +102,14 @@ if (reduceMotion || !('IntersectionObserver' in window)) {
   document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
 }
 
-// Scroll progress + compact header state.
+// Scroll progress + compact header + subtle hero parallax.
 const progressBar = document.createElement('div');
 progressBar.className = 'scroll-progress';
 progressBar.setAttribute('aria-hidden', 'true');
 document.body.appendChild(progressBar);
+const heroCopy = document.querySelector('.hero-copy');
+const heroVisual = document.querySelector('.hero-visual');
+let scrollFrame = 0;
 
 function updateScrollState() {
   const doc = document.documentElement;
@@ -114,8 +117,21 @@ function updateScrollState() {
   const progress = Math.min(100, Math.max(0, (doc.scrollTop / scrollable) * 100));
   progressBar.style.width = `${progress}%`;
   siteHeader?.classList.toggle('is-scrolled', doc.scrollTop > 18);
+
+  if (!reduceMotion && doc.scrollTop < 760) {
+    const y = Math.min(doc.scrollTop, 520);
+    heroCopy?.style.setProperty('--hero-shift', `${(y * 0.018).toFixed(1)}px`);
+    heroVisual?.style.setProperty('--visual-shift', `${(y * -0.022).toFixed(1)}px`);
+  }
 }
-window.addEventListener('scroll', updateScrollState, { passive: true });
+function requestScrollUpdate() {
+  if (scrollFrame) return;
+  scrollFrame = requestAnimationFrame(() => {
+    scrollFrame = 0;
+    updateScrollState();
+  });
+}
+window.addEventListener('scroll', requestScrollUpdate, { passive: true });
 updateScrollState();
 
 // Animate the laptop workflow as a living mini-site.
@@ -135,8 +151,12 @@ function startWorkflowLoop() {
   }, 1550);
 }
 startWorkflowLoop();
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) clearInterval(workflowTimer);
+  else startWorkflowLoop();
+});
 
-// Subtle mouse tilt for cards and the laptop. Disabled on touch/reduced-motion.
+// Subtle mouse tilt and cursor-follow glow. Disabled on touch/reduced-motion.
 const canTilt = !reduceMotion && window.matchMedia('(hover:hover) and (pointer:fine)').matches;
 if (canTilt) {
   const tiltTargets = document.querySelectorAll('.service-card,.price-card,.calculator,.lead-form,.device-shell');
@@ -144,23 +164,28 @@ if (canTilt) {
     el.classList.add('tilt-card');
     el.addEventListener('pointermove', (event) => {
       const rect = el.getBoundingClientRect();
-      const x = (event.clientX - rect.left) / rect.width - 0.5;
-      const y = (event.clientY - rect.top) / rect.height - 0.5;
-      const intensity = el.classList.contains('device-shell') ? 5 : 3.2;
-      el.style.transform = `perspective(900px) rotateX(${(-y * intensity).toFixed(2)}deg) rotateY(${(x * intensity).toFixed(2)}deg) translateY(-2px)`;
+      const px = (event.clientX - rect.left) / rect.width;
+      const py = (event.clientY - rect.top) / rect.height;
+      const x = px - 0.5;
+      const y = py - 0.5;
+      const intensity = el.classList.contains('device-shell') ? 4.2 : 2.8;
+      el.style.setProperty('--mx', `${(px * 100).toFixed(1)}%`);
+      el.style.setProperty('--my', `${(py * 100).toFixed(1)}%`);
+      el.style.transform = `perspective(1000px) rotateX(${(-y * intensity).toFixed(2)}deg) rotateY(${(x * intensity).toFixed(2)}deg) translateY(-2px)`;
     });
     el.addEventListener('pointerleave', () => {
       el.style.transform = '';
+      el.style.removeProperty('--mx');
+      el.style.removeProperty('--my');
     });
   });
 
-  const heroVisual = document.querySelector('.hero-visual');
   const ambientA = document.querySelector('.ambient-a');
   heroVisual?.addEventListener('pointermove', (event) => {
     const rect = heroVisual.getBoundingClientRect();
     const x = (event.clientX - rect.left) / rect.width - 0.5;
     const y = (event.clientY - rect.top) / rect.height - 0.5;
-    if (ambientA) ambientA.style.transform = `translate3d(${x * 35}px,${y * 25}px,0)`;
+    if (ambientA) ambientA.style.transform = `translate3d(${x * 34}px,${y * 24}px,0)`;
   });
   heroVisual?.addEventListener('pointerleave', () => {
     if (ambientA) ambientA.style.transform = '';
