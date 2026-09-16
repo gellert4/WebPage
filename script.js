@@ -2,12 +2,21 @@ const CONTACT_EMAIL = 'szalai2003@gmail.com';
 const FORMSUBMIT_ENDPOINT = `https://formsubmit.co/ajax/${CONTACT_EMAIL}`;
 const root = document.documentElement;
 
+// Progressive enhancement: load the motion layer without blocking the base experience.
+if (!document.querySelector('link[href="motion-enhancements.css"]')) {
+  const motionStyles = document.createElement('link');
+  motionStyles.rel = 'stylesheet';
+  motionStyles.href = 'motion-enhancements.css';
+  document.head.appendChild(motionStyles);
+}
+
 const menuBtn = document.querySelector('.menu-btn');
 const nav = document.querySelector('.nav');
 const langToggle = document.getElementById('langToggle');
 const themeToggle = document.getElementById('themeToggle');
 const themeIcon = themeToggle?.querySelector('.theme-icon');
 const themeMeta = document.querySelector('meta[name="theme-color"]');
+const siteHeader = document.querySelector('.site-header');
 
 let currentLang = localStorage.getItem('szalai-language') || 'hu';
 let currentTheme = localStorage.getItem('szalai-theme') || 'dark';
@@ -91,6 +100,71 @@ if (reduceMotion || !('IntersectionObserver' in window)) {
     });
   }, { threshold: 0.12 });
   document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+}
+
+// Scroll progress + compact header state.
+const progressBar = document.createElement('div');
+progressBar.className = 'scroll-progress';
+progressBar.setAttribute('aria-hidden', 'true');
+document.body.appendChild(progressBar);
+
+function updateScrollState() {
+  const doc = document.documentElement;
+  const scrollable = Math.max(1, doc.scrollHeight - doc.clientHeight);
+  const progress = Math.min(100, Math.max(0, (doc.scrollTop / scrollable) * 100));
+  progressBar.style.width = `${progress}%`;
+  siteHeader?.classList.toggle('is-scrolled', doc.scrollTop > 18);
+}
+window.addEventListener('scroll', updateScrollState, { passive: true });
+updateScrollState();
+
+// Animate the laptop workflow as a living mini-site.
+const workflowCards = [...document.querySelectorAll('.screen-card')];
+let workflowIndex = 0;
+let workflowTimer;
+function activateWorkflowCard(index) {
+  workflowCards.forEach((card, i) => card.classList.toggle('workflow-active', i === index));
+}
+function startWorkflowLoop() {
+  if (reduceMotion || workflowCards.length < 2) return;
+  clearInterval(workflowTimer);
+  activateWorkflowCard(workflowIndex);
+  workflowTimer = setInterval(() => {
+    workflowIndex = (workflowIndex + 1) % workflowCards.length;
+    activateWorkflowCard(workflowIndex);
+  }, 1550);
+}
+startWorkflowLoop();
+
+// Subtle mouse tilt for cards and the laptop. Disabled on touch/reduced-motion.
+const canTilt = !reduceMotion && window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+if (canTilt) {
+  const tiltTargets = document.querySelectorAll('.service-card,.price-card,.calculator,.lead-form,.device-shell');
+  tiltTargets.forEach((el) => {
+    el.classList.add('tilt-card');
+    el.addEventListener('pointermove', (event) => {
+      const rect = el.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width - 0.5;
+      const y = (event.clientY - rect.top) / rect.height - 0.5;
+      const intensity = el.classList.contains('device-shell') ? 5 : 3.2;
+      el.style.transform = `perspective(900px) rotateX(${(-y * intensity).toFixed(2)}deg) rotateY(${(x * intensity).toFixed(2)}deg) translateY(-2px)`;
+    });
+    el.addEventListener('pointerleave', () => {
+      el.style.transform = '';
+    });
+  });
+
+  const heroVisual = document.querySelector('.hero-visual');
+  const ambientA = document.querySelector('.ambient-a');
+  heroVisual?.addEventListener('pointermove', (event) => {
+    const rect = heroVisual.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / rect.width - 0.5;
+    const y = (event.clientY - rect.top) / rect.height - 0.5;
+    if (ambientA) ambientA.style.transform = `translate3d(${x * 35}px,${y * 25}px,0)`;
+  });
+  heroVisual?.addEventListener('pointerleave', () => {
+    if (ambientA) ambientA.style.transform = '';
+  });
 }
 
 const hours = document.getElementById('hours');
